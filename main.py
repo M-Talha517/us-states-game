@@ -20,17 +20,19 @@ def main():
     states = list(states_dataframe.state)
 
     while correct_answers < 50:
-        user_answer = screen.textinput(f"{correct_answers}/50 States Correct", "Name A State").title()
-
-        if user_answer is None or user_answer == 'exit':
+        user_answer = screen.textinput(f"{correct_answers}/50 States Correct", "Name A State")
+        if user_answer is None or user_answer.lower() == 'exit' or user_answer.title() not in states:
             to_be_stored = {
-                'name': 'States',
-                'states': user_answers
+                'name': ['Guessed States', 'Missed States'],
+                'count': [len(user_answers), len([state for state in states if states not in user_answers])],
+                'states': [user_answers, [state for state in states if states not in user_answers]]
             }
             to_be_stored = pandas.DataFrame(to_be_stored)
-            to_be_stored.to_csv('correct_answers.csv')
+            to_be_stored.to_csv("correct_answers", index=False,header=False)
             break
-        elif user_answer in states:
+
+        else:
+            user_answer = user_answer.title()
             if user_answer in user_answers:
                 continue
             correct_answers += 1
@@ -38,8 +40,6 @@ def main():
             current_state = states_dataframe[states_dataframe.state == user_answer]
             locator.goto((int(current_state.x), int(current_state.y)))
             locator.write(user_answer)
-        else:
-            break
 
 
 main()
